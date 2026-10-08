@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>神奈川住まいポータル</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#2a9d8f;--primary-dark:#1f7268;--primary-light:#e8f6f5;
+  --accent:#264653;--warn:#e76f51;--price:#d1495b;
+  --text:#333;--text2:#666;--text3:#999;
+  --border:#ddd;--bg:#f5f5f0;--white:#fff;--link:#3a7abf;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit','Noto Sans JP',sans-serif;color:var(--text);background:var(--bg);font-size:13px;line-height:1.6;}
+a{text-decoration:none;color:inherit;}
+a:hover{text-decoration:underline;}
+button,input,select{font-family:inherit;}
+img{display:block;}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px;}
+
+/* ===== サンプル表示・トースト ===== */
+.sample-bar{background:var(--accent);color:#fff;font-size:12px;text-align:center;padding:6px 16px;}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--accent);color:#fff;font-size:13px;padding:10px 18px;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.2);z-index:999;max-width:calc(100% - 32px);text-align:center;}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px;}
+
+/* ===== TOPBAR ===== */
+.topbar{background:#fff;border-bottom:1px solid var(--border);}
+.topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:4px;padding-bottom:4px;}
+.topbar-left{font-size:11px;color:var(--text3);}
+.topbar-right{display:flex;gap:14px;align-items:center;font-size:11px;flex-wrap:wrap;}
+.topbar-right a{color:var(--text2);}
+.topbar-right .cnt{color:var(--primary);font-weight:700;}
+.tb-drop{position:relative;}
+.tb-drop-menu{display:none;position:absolute;top:100%;right:0;background:#fff;border:1px solid var(--border);border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.1);padding:4px 0;z-index:400;min-width:120px;}
+.tb-drop:hover .tb-drop-menu{display:block;}
+.tb-drop-menu a{display:block;padding:5px 14px;font-size:12px;color:var(--text);}
+
+/* ===== HEADER ===== */
+.hdr{background:#fff;position:sticky;top:env(safe-area-inset-top,0px);z-index:200;box-shadow:0 1px 0 var(--border);}
+.hdr-inner{display:flex;align-items:center;gap:12px;position:relative;padding-top:10px;padding-bottom:10px;}
+.logo{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:700;color:var(--text);white-space:nowrap;flex-shrink:0;}
+.logo:hover{text-decoration:none;}
+.logo-icon{width:34px;height:34px;background:var(--primary);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.logo-pref{display:flex;flex-direction:column;align-items:flex-start;gap:1px;flex-shrink:0;}
+.logo-pref .tag{font-size:11px;font-weight:700;color:#fff;background:var(--accent);padding:0 6px;border-radius:3px;}
+.logo-pref a{font-size:10px;color:var(--link);}
+.search-bar{flex:1;display:flex;align-items:center;border:2px solid var(--primary);border-radius:3px;overflow:hidden;background:#fff;max-width:680px;margin-left:auto;}
+.sf{flex:1;padding:9px 14px;border:none;outline:none;font-size:13px;border-right:1px solid var(--border);min-width:0;}
+.ss{padding:9px 8px;border:none;outline:none;font-size:12px;border-right:1px solid var(--border);background:#fff;color:var(--text2);width:130px;}
+.ss.price{width:110px;}
+.search-btn{background:var(--primary);color:#fff;border:none;padding:9px 22px;font-size:15px;font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap;}
+.search-btn:hover{background:var(--primary-dark);}
+#suggest-box{display:none;position:absolute;top:100%;right:16px;background:#fff;border:1px solid var(--border);border-radius:3px;padding:8px 14px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.12);z-index:300;min-width:300px;max-height:320px;overflow:auto;}
+.sg-item{padding:4px 0;cursor:pointer;color:var(--link);}
+.sg-item small{color:var(--text3);margin-left:6px;}
+
+/* ===== GLOBAL NAV（目的別） ===== */
+.gnav{background:#fff;border-top:1px solid #eee;}
+.gnav-list{display:flex;list-style:none;}
+.gnav-item{flex:1;text-align:center;border-left:1px solid #eee;padding:6px 4px 7px;}
+.gnav-item:last-child{border-right:1px solid #eee;}
+.gnav-purpose{font-size:10px;color:var(--text3);line-height:1.3;}
+.gnav-links{display:flex;justify-content:center;gap:10px;}
+.gnav-links a{font-size:13px;font-weight:700;color:var(--text);}
+.gnav-links a:hover{color:var(--primary);}
+.gnav-item.sell .gnav-links a{color:var(--warn);}
+
+/* ===== BREADCRUMB / H1 ===== */
+.breadcrumb{font-size:11px;color:var(--text3);padding-top:10px;}
+.breadcrumb a{color:var(--link);}
+.breadcrumb span{margin:0 4px;}
+.page-h1{font-size:20px;font-weight:700;margin-top:6px;}
+.page-intro{font-size:12px;color:var(--text2);margin-top:4px;line-height:1.7;}
+
+/* ===== エリアマップ ===== */
+.area-map-sec{max-width:1068px;margin:14px auto 0;overflow:hidden;}
+.area-map-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--border);}
+.area-map-title{font-size:16px;font-weight:700;}
+.area-map-title small{font-size:12px;color:var(--text2);font-weight:400;margin-left:6px;}
+.map-type-chips{display:flex;flex-wrap:wrap;gap:4px;}
+.map-type-chip{padding:4px 12px;border:1px solid var(--border);border-radius:14px;font-size:12px;background:#fff;color:var(--text2);cursor:pointer;}
+.map-type-chip.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:700;}
+.area-map-body{display:flex;}
+.map-svg-wrap{flex:1.4;min-width:0;padding:12px;background:linear-gradient(180deg,#eef7fb,#dcedf5);}
+.map-svg-wrap svg{width:100%;height:auto;display:block;}
+.map-area{stroke:#fff;stroke-width:3;stroke-linejoin:round;cursor:pointer;transition:filter .15s,opacity .15s;}
+.map-area:hover{filter:brightness(.93);}
+.map-area.on{stroke:var(--accent);stroke-width:4;}
+.map-label{font-size:15px;font-weight:700;fill:#264653;pointer-events:none;text-anchor:middle;}
+.map-cnt{font-size:11px;fill:#264653;opacity:.75;pointer-events:none;text-anchor:middle;}
+.map-sea{font-size:13px;fill:#7fa9bf;font-style:italic;text-anchor:middle;pointer-events:none;letter-spacing:4px;}
+.map-out{font-size:12px;fill:#999;text-anchor:middle;pointer-events:none;}
+.area-detail{flex:1;padding:16px;border-left:1px solid var(--border);display:flex;flex-direction:column;}
+.area-detail-name{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.area-detail-name .dot{width:14px;height:14px;border-radius:3px;display:inline-block;}
+.area-detail-cnt{font-size:12px;color:var(--text2);margin:2px 0 10px;}
+.area-detail-cnt strong{color:var(--price);font-size:16px;}
+.area-detail .region-links{margin-bottom:12px;}
+.area-detail .region-links a{margin-bottom:4px;}
+.area-detail-hint{font-size:11px;color:var(--text3);margin-top:auto;}
+
+/* ===== HERO ===== */
+.hero{max-width:1068px;margin:14px auto 0;aspect-ratio:1200/260;position:relative;overflow:hidden;border-radius:12px;background:linear-gradient(120deg,var(--accent),var(--primary));}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity .6s;pointer-events:none;}
+.hero-slide.on{opacity:1;pointer-events:auto;}
+.hero-fallback{position:absolute;inset:0;display:flex;align-items:center;padding:0 60px;color:#fff;}
+.hero-fallback .badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);padding:4px 12px;border-radius:14px;font-size:12px;margin-bottom:10px;display:inline-block;}
+.hero-fallback h2{font-size:28px;font-weight:700;line-height:1.3;margin-bottom:8px;font-family:'Noto Serif JP',serif;}
+.hero-fallback p{font-size:14px;opacity:.85;}
+.hero-emoji{font-size:100px;opacity:.25;position:absolute;right:60px;top:50%;transform:translateY(-50%);}
+.hero-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:2;}
+.hero-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.45);cursor:pointer;border:none;}
+.hero-dot.on{background:#fff;}
+
+/* ===== LAYOUT ===== */
+.layout{max-width:1100px;margin:16px auto;padding:0 16px;display:flex;gap:20px;align-items:flex-start;}
+.main{flex:1;min-width:0;}
+.side{width:240px;flex-shrink:0;}
+
+/* ===== SECTION ===== */
+.sec{margin-bottom:28px;}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;gap:8px;}
+.sec-title{font-size:18px;font-weight:700;padding-left:10px;border-left:4px solid var(--primary);line-height:1.3;}
+.sec-sub{font-size:12px;color:var(--text2);font-weight:400;margin-left:6px;}
+.sec-more{font-size:12px;color:var(--link);white-space:nowrap;}
+.note{font-size:11px;color:var(--text3);}
+.box{background:#fff;border:1px solid var(--border);border-radius:6px;}
+
+/* ===== 種別カード ===== */
+.type-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.type-card{border-radius:6px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:1;background:#fff;border:2px solid transparent;transition:border-color .15s,box-shadow .15s;}
+.type-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.12);}
+.type-card.on{border-color:var(--primary);}
+.type-card-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,var(--primary-light),var(--primary));}
+.type-card-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:#fff;padding:5px 6px;font-size:12px;font-weight:700;text-align:center;}
+.type-card-cnt{font-size:10px;opacity:.85;font-weight:400;}
+.type-sub-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px;}
+.type-sub-links a{font-size:12px;color:var(--link);font-weight:700;}
+.type-sub-links a.sell{color:var(--warn);}
+
+/* ===== 探す パネル ===== */
+.find-panel{overflow:hidden;}
+.find-tabs{display:flex;border-bottom:1px solid var(--border);background:#fafafa;}
+.find-tab{flex:1;padding:10px 6px;font-size:13px;font-weight:700;border:none;background:none;cursor:pointer;color:var(--text2);border-bottom:3px solid transparent;}
+.find-tab.on{color:var(--primary);border-bottom-color:var(--primary);background:#fff;}
+.find-body{padding:14px 16px;}
+.find-type-label{font-size:12px;color:var(--text2);margin-bottom:10px;}
+.find-type-label strong{color:var(--primary);}
+.region-row{display:flex;gap:0;padding:6px 0;border-bottom:1px dashed #eee;}
+.region-row:last-child{border:none;}
+.region-name{font-size:12px;font-weight:700;color:var(--text2);width:100px;flex-shrink:0;padding-top:1px;}
+.region-links{display:flex;flex-wrap:wrap;gap:3px 0;}
+.region-links a{font-size:12px;color:var(--link);padding:1px 7px;border-right:1px solid var(--border);}
+.region-links a:last-child{border:none;}
+.region-links a .c{color:var(--text3);font-size:10px;margin-left:2px;}
+.line-group-title{font-size:12px;font-weight:700;color:var(--accent);margin:8px 0 4px;}
+.line-group-title:first-child{margin-top:0;}
+.line-links{display:flex;flex-wrap:wrap;gap:5px;}
+.line-links a{font-size:12px;color:var(--link);padding:3px 10px;border:1px solid var(--border);border-radius:14px;background:#fff;}
+.line-links a:hover{border-color:var(--primary);text-decoration:none;}
+.map-box{display:flex;gap:16px;align-items:center;}
+.map-visual{width:220px;aspect-ratio:4/3;border-radius:6px;background:linear-gradient(135deg,#dff3f1,#a8d8d2);display:flex;align-items:center;justify-content:center;font-size:56px;flex-shrink:0;}
+.map-text p{font-size:13px;color:var(--text2);margin-bottom:10px;}
+.btn{display:inline-block;padding:9px 22px;background:var(--primary);color:#fff;border-radius:3px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:background .15s;}
+.btn:hover{background:var(--primary-dark);text-decoration:none;}
+.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary);}
+.btn.ghost:hover{background:var(--primary-light);}
+.btn.warn{background:var(--warn);}
+.btn.warn:hover{background:#c85a3f;}
+.btn.sm{padding:6px 14px;font-size:12px;}
+
+/* ===== 注目の駅 ===== */
+.pickup{display:flex;flex-wrap:wrap;gap:6px;}
+.pickup a{font-size:12px;padding:5px 12px;border-radius:16px;background:#fff;border:1px solid var(--border);color:var(--text);}
+.pickup a::before{content:'🚉 ';}
+.pickup a:hover{border-color:var(--primary);color:var(--primary);text-decoration:none;}
+
+/* ===== 条件で絞り込む ===== */
+.cond-box{padding:6px 16px;}
+.cond-row{display:flex;padding:10px 0;border-bottom:1px solid #f0f0f0;}
+.cond-row:last-child{border:none;}
+.cond-name{width:80px;flex-shrink:0;font-size:12px;font-weight:700;color:var(--accent);padding-top:3px;}
+.kodawari-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.kodawari-tag{padding:3px 10px;border:1px solid var(--border);border-radius:3px;font-size:12px;color:var(--text2);background:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.kodawari-tag:hover{border-color:var(--primary);color:var(--primary);}
+.kodawari-tag.on{background:var(--primary-light);border-color:var(--primary);color:var(--primary);}
+.cond-actions{display:flex;justify-content:space-between;align-items:center;padding:10px 0 6px;}
+
+/* ===== 3:2カード ===== */
+.scene-cards{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+.scene-card{border-radius:4px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:3/2;background:linear-gradient(135deg,var(--primary-light),var(--primary));}
+.scene-card-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:30px;}
+.scene-card-label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.5);color:#fff;padding:3px 4px;font-size:11px;font-weight:700;text-align:center;}
+
+/* ===== 特集 SLIDER ===== */
+.feature-slider{position:relative;overflow:hidden;}
+.feature-track{display:flex;gap:10px;transition:transform .3s;}
+.feature-item{width:calc(50% - 5px);flex-shrink:0;border-radius:6px;overflow:hidden;position:relative;cursor:pointer;aspect-ratio:600/188;background:linear-gradient(135deg,var(--accent),var(--primary));}
+.feature-item-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;padding-right:24px;font-size:60px;opacity:.35;}
+.feature-item-content{position:absolute;inset:0;padding:16px 20px;display:flex;flex-direction:column;justify-content:flex-end;}
+.feature-item-badge{background:rgba(255,255,255,.9);color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;border-radius:2px;margin-bottom:6px;width:fit-content;}
+.feature-item-title{font-size:17px;font-weight:700;color:#fff;margin-bottom:2px;}
+.feature-item-desc{font-size:12px;color:rgba(255,255,255,.88);}
+.slider-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.9);border:none;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;z-index:3;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.slider-nav.prev{left:4px;}
+.slider-nav.next{right:4px;}
+
+/* ===== 物件カード ===== */
+.prop-tabs{display:flex;gap:16px;margin-bottom:12px;border-bottom:1px solid var(--border);overflow-x:auto;}
+.prop-tab{padding:6px 0;font-size:13px;cursor:pointer;border:none;background:none;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;}
+.prop-tab.on{color:var(--text);font-weight:700;border-bottom-color:var(--primary);}
+.prop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.prop-card{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:box-shadow .15s;}
+.prop-card:hover{box-shadow:0 2px 10px rgba(0,0,0,.1);}
+.prop-img{aspect-ratio:4/3;background:linear-gradient(135deg,var(--primary-light),#9fd3cc);display:flex;align-items:center;justify-content:center;font-size:42px;position:relative;}
+.prop-badge{position:absolute;top:6px;left:6px;background:var(--warn);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:2px;}
+.prop-fav{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);border:none;cursor:pointer;font-size:14px;color:var(--text3);}
+.prop-fav.on{color:var(--warn);}
+.prop-info{padding:8px 10px 10px;}
+.prop-type{font-size:10px;color:var(--primary);font-weight:700;}
+.prop-price{font-size:18px;font-weight:700;color:var(--price);line-height:1.3;}
+.prop-spec{font-size:12px;}
+.prop-addr{font-size:11px;color:var(--text2);}
+.prop-access{font-size:11px;color:var(--text3);}
+
+/* ===== 物件名・会社から探す ===== */
+.finder-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.finder-card{padding:14px 16px;}
+.finder-card h3{font-size:14px;font-weight:700;margin-bottom:4px;}
+.finder-card p{font-size:12px;color:var(--text2);margin-bottom:8px;}
+.finder-form{display:flex;gap:6px;}
+.finder-form input{flex:1;padding:7px 10px;border:1px solid var(--border);border-radius:3px;font-size:13px;outline:none;min-width:0;}
+.finder-form input:focus{border-color:var(--primary);}
+
+/* ===== 相場 ===== */
+.souba-links{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.souba-links a{font-size:12px;padding:4px 12px;border:1px solid var(--primary);border-radius:3px;color:var(--primary);background:#fff;}
+.souba-links a:hover{background:var(--primary-light);text-decoration:none;}
+.souba-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);font-size:12px;}
+.souba-table th{background:var(--primary-light);color:var(--primary-dark);font-weight:700;padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.souba-table td{padding:7px 10px;border-bottom:1px solid #f0f0f0;}
+.souba-table td.num{text-align:right;font-weight:700;}
+.souba-table a{color:var(--link);}
+.up{color:var(--warn);font-size:11px;}
+.down{color:var(--link);font-size:11px;}
+
+/* ===== ノウハウ・記事 ===== */
+.knowhow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.knowhow-item{padding:12px;cursor:pointer;transition:box-shadow .15s;}
+.knowhow-item:hover{box-shadow:0 2px 8px rgba(0,0,0,.08);}
+.knowhow-ico{font-size:22px;}
+.knowhow-name{font-size:13px;font-weight:700;color:var(--link);margin:2px 0;}
+.knowhow-desc{font-size:11px;color:var(--text2);line-height:1.5;}
+.articles-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;}
+.articles-scroll::-webkit-scrollbar{height:3px;}
+.articles-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.article-card{width:160px;flex-shrink:0;cursor:pointer;}
+.article-card-img{width:160px;aspect-ratio:3/2;border-radius:4px;background:linear-gradient(135deg,var(--primary-light),var(--primary));display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:6px;}
+.article-cat{font-size:10px;color:var(--primary);font-weight:700;}
+.article-card-title{font-size:12px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.town-list{display:flex;flex-direction:column;}
+.town-item{display:flex;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;}
+.town-item:last-child{border:none;}
+.town-item:hover{background:#fafafa;}
+.town-thumb{width:96px;aspect-ratio:3/2;flex-shrink:0;border-radius:4px;background:linear-gradient(135deg,#e3f2fd,#90caf9);display:flex;align-items:center;justify-content:center;font-size:28px;}
+.town-date{font-size:11px;color:var(--text3);}
+.town-title{font-size:13px;font-weight:700;color:var(--link);line-height:1.4;}
+.town-area{font-size:11px;color:var(--text2);}
+
+/* ===== 相談・売却 ===== */
+.consult-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.consult-card{padding:16px;display:flex;flex-direction:column;}
+.consult-card .ico{font-size:26px;}
+.consult-card h3{font-size:14px;font-weight:700;margin:4px 0;}
+.consult-card p{font-size:12px;color:var(--text2);line-height:1.6;flex:1;margin-bottom:10px;}
+
+/* ===== 近隣・地方 ===== */
+.link-row{display:flex;padding:8px 12px;border-bottom:1px solid #f0f0f0;}
+.link-row:last-child{border:none;}
+.link-row .region-name{width:150px;}
+
+/* ===== SIDEBAR ===== */
+.sb-block{background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:12px;}
+.sb-head{font-size:13px;font-weight:700;padding:8px 12px;border-bottom:1px solid var(--border);}
+.sb-body{padding:10px 12px;}
+.sb-login p{font-size:12px;color:var(--text2);margin-bottom:8px;}
+.sb-login .btn{width:100%;text-align:center;margin-bottom:6px;}
+.sb-item{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid #f5f5f5;cursor:pointer;}
+.sb-item:last-child{border:none;}
+.sb-thumb{width:48px;height:36px;flex-shrink:0;border-radius:3px;background:linear-gradient(135deg,var(--primary-light),var(--primary));display:flex;align-items:center;justify-content:center;font-size:16px;}
+.sb-name{font-size:12px;font-weight:700;color:var(--price);line-height:1.3;}
+.sb-sub{font-size:10px;color:var(--text2);}
+.sb-empty{font-size:12px;color:var(--text3);}
+.sim-row{margin-bottom:8px;}
+.sim-row label{display:block;font-size:11px;color:var(--text2);margin-bottom:2px;}
+.sim-row input{width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:3px;font-size:13px;outline:none;}
+.sim-row input:focus{border-color:var(--primary);}
+.sim-result{background:var(--primary-light);border-radius:4px;padding:8px;text-align:center;margin-top:4px;}
+.sim-result .lbl{font-size:11px;color:var(--text2);}
+.sim-result .val{font-size:20px;font-weight:700;color:var(--primary-dark);}
+.sb-news-item{padding:5px 0;border-bottom:1px solid #f5f5f5;}
+.sb-news-item:last-child{border:none;}
+.sb-news-date{font-size:11px;color:var(--text3);}
+.sb-news-link{font-size:12px;color:var(--link);}
+
+/* ===== FOOTER ===== */
+.footer-nav{background:#fff;border-top:3px solid var(--primary);margin-top:20px;padding:16px 0;}
+.footer-nav-title{font-size:12px;font-weight:700;margin:10px 0 4px;}
+.footer-nav-title:first-child{margin-top:0;}
+footer{background:var(--bg);border-top:1px solid var(--border);padding:16px 0 12px;}
+.footer-links{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:8px;}
+.footer-links a{font-size:11px;color:var(--text2);padding:3px 10px;border-right:1px solid var(--border);}
+.footer-links a:hover{color:var(--primary);}
+.footer-logo-row{display:flex;align-items:center;gap:6px;margin-bottom:8px;}
+.footer-logo-row .icon{width:20px;height:20px;background:var(--primary);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.footer-logo-row span{font-size:15px;font-weight:700;}
+.footer-copy{font-size:11px;color:var(--text3);}
+.pagetop{position:fixed;right:16px;bottom:16px;width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:16px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);display:none;z-index:150;}
+
+@media(max-width:900px){
+  .side{display:none;}
+  .type-cards{grid-template-columns:repeat(3,1fr);}
+  .scene-cards{grid-template-columns:repeat(3,1fr);}
+  .prop-grid{grid-template-columns:repeat(2,1fr);}
+  .knowhow{grid-template-columns:repeat(2,1fr);}
+  .consult-cards{grid-template-columns:1fr;}
+  .gnav-purpose{display:none;}
+  .gnav-links{flex-direction:column;gap:0;}
+  .area-map-body{flex-direction:column;}
+  .area-detail{border-left:none;border-top:1px solid var(--border);}
+  .hero-fallback{padding:0 24px;}
+  .hero-fallback h2{font-size:20px;}
+  .hero-emoji{display:none;}
+}
+@media(max-width:640px){
+  .topbar-left{display:none;}
+  .hdr-inner{flex-wrap:wrap;}
+  .search-bar{max-width:none;width:100%;flex:0 0 100%;margin-left:0;flex-wrap:wrap;}
+  .map-label{font-size:18px;}
+  .map-cnt{font-size:14px;}
+  .ss{flex:1;width:auto;}
+  .sf{flex-basis:100%;border-right:none;border-bottom:1px solid var(--border);}
+  #suggest-box{left:16px;right:16px;}
+  .gnav-list{overflow-x:auto;}
+  .gnav-item{flex:0 0 auto;padding:6px 10px;}
+  .gnav-links a{font-size:12px;}
+  .feature-item{width:100%;}
+  .find-tab{font-size:11px;}
+  .region-row,.link-row,.cond-row{flex-direction:column;}
+  .map-box{flex-direction:column;align-items:flex-start;}
+  .finder-cards{grid-template-columns:1fr;}
+  .hero{border-radius:0;}
+}
+</style>
+</head>
+<body>
+
+
+<div class="sample-bar">デザインサンプルです。物件・件数・相場・記事はすべて架空のデータです。</div>
+<div class="toast" id="toast" hidden></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <span class="topbar-left" id="topbar-text"></span>
+    <div class="topbar-right">
+      <div class="tb-drop">
+        <a href="#">お気に入り <span class="cnt" id="fav-count">0</span> ▾</a>
+        <div class="tb-drop-menu">
+          <a href="#">物件</a><a href="#">不動産会社</a><a href="#">保存した検索条件</a>
+        </div>
+      </div>
+      <a href="#">閲覧履歴</a>
+      <a href="#">会員登録</a>
+      <a href="#">ログイン</a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="wrap hdr-inner">
+    <a class="logo" href="index.html">
+      <div class="logo-icon">🏠</div>
+      <span data-site-name></span>
+    </a>
+    <div class="logo-pref">
+      <span class="tag"><span data-region-name></span>版</span>
+      <a href="#" id="to-national">全国へ ›</a>
+    </div>
+    <div class="search-bar">
+      <select class="ss" id="q-type"></select>
+      <input class="sf" type="text" id="area-inp" placeholder="市区町村・駅名 [例：藤沢、武蔵小杉]" oninput="showSuggest(this)" autocomplete="off">
+      <select class="ss price" id="q-price">
+        <option value="">価格上限なし</option>
+        <option value="2000">〜2,000万円</option>
+        <option value="3000">〜3,000万円</option>
+        <option value="4000">〜4,000万円</option>
+        <option value="5000">〜5,000万円</option>
+        <option value="7000">〜7,000万円</option>
+        <option value="10000">〜1億円</option>
+      </select>
+      <button class="search-btn" onclick="doSearch()">検索</button>
+    </div>
+    <div id="suggest-box"><div id="suggest-content"></div></div>
+  </div>
+  <nav class="gnav">
+    <ul class="wrap gnav-list" id="gnav"></ul>
+  </nav>
+</header>
+
+<!-- BREADCRUMB / H1 -->
+<div class="wrap">
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <h1 class="page-h1" id="page-h1"></h1>
+  <p class="page-intro" id="page-intro"></p>
+</div>
+
+<!-- エリアマップ（トップ） -->
+<div class="wrap">
+  <div class="box area-map-sec">
+    <div class="area-map-head">
+      <div class="area-map-title">地図からエリアを選ぶ<small>エリアをクリックすると市区町村が表示されます</small></div>
+      <div class="map-type-chips" id="map-type-chips"></div>
+    </div>
+    <div class="area-map-body">
+      <div class="map-svg-wrap"><svg id="kmap" viewBox="0 0 600 440" role="img" aria-label="エリア地図"></svg></div>
+      <div class="area-detail" id="area-detail"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+<div class="main">
+
+  <!-- 種別から探す -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">物件の種類から探す</div></div>
+    <div class="type-cards" id="type-cards"></div>
+    <div class="type-sub-links">
+      <a href="sell.html" class="sell">› 不動産を売る（無料査定）</a>
+      <a href="#">› リノベーション済み物件</a>
+      <a href="#">› 住宅ローン</a>
+    </div>
+  </div>
+
+  <!-- 沿線・エリア・地図から探す -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-title">エリア・沿線・地図から探す</div>
+      <span class="note">※件数はデモ表示です</span>
+    </div>
+    <div class="box find-panel">
+      <div class="find-tabs">
+        <button class="find-tab on" data-mode="area" onclick="setFindMode('area')">エリアから探す</button>
+        <button class="find-tab" data-mode="line" onclick="setFindMode('line')">沿線・駅から探す</button>
+        <button class="find-tab" data-mode="map" onclick="setFindMode('map')">地図から探す</button>
+      </div>
+      <div class="find-body">
+        <div class="find-type-label">選択中の種類：<strong id="find-type-name"></strong>（上のカードで切り替え）</div>
+        <div id="find-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 注目の駅 -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">注目の駅から探す</div></div>
+    <div class="pickup" id="pickup"></div>
+  </div>
+
+  <!-- 条件で絞り込む -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">条件で絞り込む</div></div>
+    <div class="box cond-box">
+      <div class="cond-row"><div class="cond-name">価格</div><div class="kodawari-tags" id="cond-price"></div></div>
+      <div class="cond-row"><div class="cond-name">間取り</div><div class="kodawari-tags" id="cond-madori"></div></div>
+      <div class="cond-row"><div class="cond-name">駅徒歩</div><div class="kodawari-tags" id="cond-walk"></div></div>
+      <div class="cond-row"><div class="cond-name">築年数</div><div class="kodawari-tags" id="cond-age"></div></div>
+      <div class="cond-row"><div class="cond-name">特徴</div><div class="kodawari-tags" id="cond-feature"></div></div>
+      <div class="cond-actions">
+        <a href="#" onclick="clearCond();return false;" style="font-size:12px;color:var(--link);">条件をクリア</a>
+        <button class="btn" onclick="doSearch()">この条件で探す</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 特集 -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">特集</div><a href="#" class="sec-more">› 特集一覧へ</a></div>
+    <div class="feature-slider">
+      <div class="feature-track" id="feature-track"></div>
+      <button class="slider-nav prev" onclick="slideFeature(-1)">‹</button>
+      <button class="slider-nav next" onclick="slideFeature(1)">›</button>
+    </div>
+  </div>
+
+  <!-- 暮らし方 -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">暮らし方から探す</div></div>
+    <div class="scene-cards" id="scene-cards"></div>
+  </div>
+
+  <!-- こだわり -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">人気のこだわり条件</div></div>
+    <div class="scene-cards" id="kodawari-cards"></div>
+  </div>
+
+  <!-- 新着物件 -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-title">新着物件</div>
+      <a href="#" class="sec-more">› 新着物件をすべて見る</a>
+    </div>
+    <div class="prop-tabs" id="prop-tabs"></div>
+    <div class="prop-grid" id="prop-grid"></div>
+    <div class="note" style="margin-top:6px;">※掲載物件はデモデータです</div>
+  </div>
+
+  <!-- 物件名・不動産会社から探す -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">物件名・不動産会社から探す</div></div>
+    <div class="finder-cards">
+      <div class="box finder-card">
+        <h3>🏢 物件名から探す</h3>
+        <p>マンション名を入力すると、売り出し中の住戸や過去の情報を確認できます。</p>
+        <div class="finder-form"><input type="text" id="q-bldg" placeholder="例：〇〇レジデンス"><button class="btn sm" onclick="findBy('bldg')">検索</button></div>
+      </div>
+      <div class="box finder-card">
+        <h3>🏪 不動産会社から探す</h3>
+        <p>エリアごとの不動産会社と、掲載中の物件数を確認できます。</p>
+        <div class="finder-form"><input type="text" id="q-company" placeholder="会社名・市区町村"><button class="btn sm" onclick="findBy('company')">検索</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 相場 -->
+  <div class="sec">
+    <div class="sec-head">
+      <div class="sec-title"><span data-pref-name></span>の価格相場を見る</div>
+    </div>
+    <div class="souba-links" id="souba-links"></div>
+    <table class="souba-table">
+      <thead><tr><th>エリア（中古マンション 70㎡換算）</th><th style="text-align:right;">平均価格</th><th style="text-align:right;">前年比</th></tr></thead>
+      <tbody id="souba-body"></tbody>
+    </table>
+    <div class="note" style="margin-top:4px;">※相場はデモ値です。実データ接続後に差し替え</div>
+  </div>
+
+  <!-- 住まいのノウハウ -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">住まい購入のノウハウ</div><a href="#" class="sec-more">› 記事一覧へ</a></div>
+    <div class="knowhow" id="knowhow"></div>
+    <div class="articles-scroll" id="articles"></div>
+  </div>
+
+  <!-- 街の記事 -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title"><span data-pref-name></span>の街を知る</div><a href="#" class="sec-more">› 街の記事一覧へ</a></div>
+    <div class="box town-list" id="town-list"></div>
+  </div>
+
+  <!-- 相談・売却 -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">相談・お金のサービス</div></div>
+    <div class="consult-cards">
+      <div class="box consult-card">
+        <div class="ico">💬</div>
+        <h3>住まい購入の無料相談</h3>
+        <p>エリア選びから資金計画まで、購入の進め方をアドバイザーに相談できます。</p>
+        <a class="btn sm" href="#">相談を予約する</a>
+      </div>
+      <div class="box consult-card">
+        <div class="ico">🏦</div>
+        <h3>住宅ローンの事前チェック</h3>
+        <p>物件探しの前に、借りられる金額の目安を確認しておきましょう。</p>
+        <a class="btn sm ghost" href="#">借入可能額を調べる</a>
+      </div>
+      <div class="box consult-card">
+        <div class="ico">🏷</div>
+        <h3>住まいを売る</h3>
+        <p>複数の不動産会社にまとめて査定を依頼。売却価格の目安を無料で確認できます。</p>
+        <a class="btn sm warn" href="sell.html">無料で売却査定</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 近隣の都道府県 -->
+  <div class="sec">
+    <div class="sec-head"><div class="sec-title">ほかの地域から探す</div></div>
+    <div class="box">
+      <div class="link-row"><div class="region-name">近隣の都道府県</div><div class="region-links" id="neighbor-links"></div></div>
+      <div class="link-row"><div class="region-name">地方から探す</div><div class="region-links" id="region-links"></div></div>
+    </div>
+  </div>
+
+  <!-- 不動産会社向け -->
+  <div class="box" style="padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:14px;font-weight:700;">不動産会社の方へ</div>
+      <div style="font-size:12px;color:var(--text2);">物件掲載・反響管理のご案内、掲載会社ログインはこちら</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <a class="btn sm ghost" href="#">掲載のご案内</a>
+      <a class="btn sm ghost" href="#">掲載会社ログイン</a>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- SIDEBAR -->
+<aside class="side">
+
+  <div class="sb-block">
+    <div class="sb-body sb-login">
+      <p>会員登録すると、お気に入り・検索条件の保存や新着物件メールが使えます。</p>
+      <button class="btn">会員登録（無料）</button>
+      <button class="btn ghost">ログイン</button>
+    </div>
+  </div>
+
+  <div class="sb-block">
+    <div class="sb-head">お気に入り物件</div>
+    <div class="sb-body" id="sb-fav"></div>
+  </div>
+
+  <div class="sb-block">
+    <div class="sb-head">最近見た物件</div>
+    <div class="sb-body" id="sb-history"></div>
+  </div>
+
+  <div class="sb-block">
+    <div class="sb-head">住宅ローン 簡易シミュレーション</div>
+    <div class="sb-body">
+      <div class="sim-row"><label>借入額（万円）</label><input type="number" id="sim-amount" value="4000" min="0" oninput="calcLoan()"></div>
+      <div class="sim-row"><label>金利（年 %）</label><input type="number" id="sim-rate" value="0.8" step="0.05" min="0" oninput="calcLoan()"></div>
+      <div class="sim-row"><label>返済期間（年）</label><input type="number" id="sim-years" value="35" min="1" max="50" oninput="calcLoan()"></div>
+      <div class="sim-result"><div class="lbl">毎月の返済額（元利均等・ボーナス払いなし）</div><div class="val" id="sim-result">-</div></div>
+    </div>
+  </div>
+
+  <div class="sb-block">
+    <div class="sb-head">お知らせ</div>
+    <div class="sb-body" id="sb-news"></div>
+  </div>
+
+</aside>
+</div><!-- /layout -->
+
+<!-- FOOTER NAV -->
+<div class="footer-nav">
+  <div class="wrap">
+    <div class="footer-nav-title"><span data-pref-name></span>の市区町村から探す</div>
+    <div class="region-links" id="footer-cities"></div>
+    <div class="footer-nav-title">物件の種類から探す</div>
+    <div class="region-links" id="footer-types"></div>
+    <div class="footer-nav-title">地方から探す</div>
+    <div class="region-links" id="footer-regions"></div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-logo-row"><div class="icon">🏠</div><span data-site-name></span></div>
+    <div class="footer-links">
+      <a href="#">はじめての方へ</a><a href="#">ヘルプ・お問い合わせ</a>
+      <a href="#">不動産会社様向け掲載のご案内</a><a href="#">利用規約</a>
+      <a href="#">個人情報保護方針</a><a href="#">運営会社</a><a href="#">サイトマップ</a>
+    </div>
+    <div class="footer-copy">© <span id="copy-year"></span> MTinlet株式会社 All Rights Reserved.</div>
+  </div>
+</footer>
+
+<button class="pagetop" id="pagetop" onclick="window.scrollTo({top:0,behavior:'smooth'})">▲</button>
+
+<script>
+/* ============================================================
+   サンプル公開用：未作成ページへの遷移はトーストで案内
+============================================================ */
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(()=>{ t.hidden = true; }, 2600);
+}
+function pageLabel(u){
+  const f = String(u).split('?')[0].replace(/^(\.\.\/)+/,'');
+  return ({'search.html':'検索結果一覧','property.html':'物件詳細','sell.html':'売却査定','souba.html':'相場','library.html':'物件ライブラリー','company.html':'不動産会社一覧'})[f] || 'このページ';
+}
+const NAV = { set href(u){ toast(`サンプルのため「${pageLabel(u)}」は準備中です`); } };
+document.addEventListener('click', e=>{
+  const a = e.target.closest('a[href]');
+  if(!a) return;
+  const h = a.getAttribute('href');
+  if(h.startsWith('http')) return;
+  e.preventDefault();
+  if(h !== '#') NAV.href = h; else if(!a.getAttribute('onclick')) toast('サンプルのため、この機能は準備中です');
+}, true);
+
+/* ============================================================
+   ① サービス設定（名前はここだけ変えれば全体に反映）
+============================================================ */
+const SITE = {
+  name: 'サービス名',            // ★正式名称が決まったら差し替え
+  tagline: '不動産購入・住まい探しサイト',
+};
+
+/* ============================================================
+   ② 全国共通：地方・都道府県（全国展開時に使用）
+============================================================ */
+const REGIONS = [
+  {code:'hokkaido', name:'北海道'},
+  {code:'tohoku',   name:'東北'},
+  {code:'kanto',    name:'関東'},
+  {code:'koshinetsu', name:'甲信越・北陸'},
+  {code:'tokai',    name:'東海'},
+  {code:'kansai',   name:'関西'},
+  {code:'chugoku',  name:'中国'},
+  {code:'shikoku',  name:'四国'},
+  {code:'kyushu',   name:'九州・沖縄'},
+];
+
+/* ============================================================
+   ③ 都道府県設定（全国展開時はこのブロックを県ごとに差し替え）
+============================================================ */
+const PREF = {
+  code: 'kanagawa',
+  name: '神奈川',
+  fullName: '神奈川県',
+  region: 'kanto',
+  neighbors: [
+    {code:'tokyo', name:'東京都'},{code:'saitama', name:'埼玉県'},{code:'chiba', name:'千葉県'},
+    {code:'yamanashi', name:'山梨県'},{code:'shizuoka', name:'静岡県'},
+  ],
+  intro: '神奈川県で家を買うなら。中古・新築マンション、一戸建て、土地の売り出し物件を、エリア・沿線・駅・地図・こだわり条件から探せます。価格相場や街の情報もあわせてチェックできます。',
+  heroCopy: [
+    {badge:'NEW', title:'海も、都心も、近くに。', desc:'神奈川の新築・中古物件をまとめて検索', e:'🌊'},
+    {badge:'特集', title:'湘南で叶える、海のある暮らし', desc:'藤沢・茅ヶ崎・鎌倉の一戸建て特集', e:'🏄'},
+    {badge:'特集', title:'都心30分圏のファミリーマンション', desc:'武蔵小杉・横浜・新百合ヶ丘エリア', e:'🏙'},
+  ],
+  // shape：地図用の簡易ポリゴン（viewBox 600×440 の模式図）／lx,ly：ラベル位置
+  areas: [
+    {key:'yokohama', name:'横浜市', prefix:'横浜市', color:'#a8dadc',
+     cities:['鶴見区','神奈川区','西区','中区','南区','保土ケ谷区','磯子区','金沢区','港北区','戸塚区','港南区','旭区','緑区','瀬谷区','栄区','泉区','青葉区','都筑区'],
+     shape:'368,118 508,196 500,232 486,268 452,300 404,306 352,296 336,262 344,214 336,160 336,124', lx:428, ly:236},
+    {key:'kawasaki', name:'川崎市', prefix:'川崎市', color:'#f6d6ad',
+     cities:['川崎区','幸区','中原区','高津区','宮前区','多摩区','麻生区'],
+     shape:'336,92 372,70 420,104 470,140 530,172 508,196 368,118 336,124', lx:474, ly:162},
+    {key:'sagamihara', name:'相模原市', prefix:'相模原市', color:'#cde8b0',
+     cities:['緑区','中央区','南区'],
+     shape:'40,70 120,40 220,30 300,54 336,92 336,124 336,160 290,166 230,160 160,152 70,150 46,118', lx:200, ly:100},
+    {key:'kenou', name:'県央', color:'#cfd8f0',
+     cities:['厚木市','大和市','海老名市','座間市','綾瀬市','伊勢原市','秦野市','愛川町','清川村'],
+     shape:'160,152 230,160 290,166 336,160 344,214 336,262 290,268 230,262 178,242', lx:262, ly:214},
+    {key:'kensei', name:'県西', color:'#e6d5f0',
+     cities:['小田原市','南足柄市','箱根町','真鶴町','湯河原町','開成町','大井町','松田町','山北町','中井町'],
+     shape:'46,118 70,150 160,152 178,242 176,300 160,352 132,404 96,410 70,370 40,320 24,240 30,170', lx:104, ly:270},
+    {key:'shonan', name:'湘南', color:'#fbe7a1',
+     cities:['藤沢市','茅ヶ崎市','平塚市','鎌倉市','逗子市','寒川町','大磯町','二宮町'],
+     shape:'178,242 230,262 290,268 336,262 352,296 370,322 362,340 300,334 240,326 176,300', lx:270, ly:302},
+    {key:'miura', name:'三浦半島', color:'#f4c7c3',
+     cities:['横須賀市','三浦市','葉山町'],
+     shape:'352,296 404,306 452,300 470,330 452,370 432,412 398,424 388,384 370,322', lx:420, ly:358},
+  ],
+  lines: [
+    {group:'JR', items:['東海道本線','横須賀線','京浜東北・根岸線','横浜線','南武線','相模線','湘南新宿ライン']},
+    {group:'東急', items:['東横線','田園都市線','目黒線','こどもの国線']},
+    {group:'京急', items:['京急本線','京急久里浜線','京急逗子線','京急大師線']},
+    {group:'相鉄', items:['相鉄本線','相鉄いずみ野線','相鉄新横浜線']},
+    {group:'小田急', items:['小田原線','江ノ島線','多摩線']},
+    {group:'その他', items:['横浜市営地下鉄ブルーライン','横浜市営地下鉄グリーンライン','みなとみらい線','江ノ島電鉄線','湘南モノレール','金沢シーサイドライン','京王相模原線']},
+  ],
+  pickupStations: ['武蔵小杉','横浜','溝の口','大船','辻堂','相模大野','海老名','新百合ヶ丘','たまプラーザ','日吉','藤沢','本厚木'],
+  stations: ['横浜','新横浜','武蔵小杉','川崎','溝の口','たまプラーザ','センター北','センター南','あざみ野','青葉台','日吉','綱島','菊名','戸塚','大船','藤沢','辻堂','茅ヶ崎','平塚','鎌倉','逗子','横須賀中央','上大岡','海老名','本厚木','大和','相模大野','橋本','新百合ヶ丘','登戸','小田原','二俣川','湘南台','みなとみらい'],
+  souba: [
+    {area:'横浜市西区', price:7280, diff:+6.2},
+    {area:'川崎市中原区', price:6950, diff:+4.8},
+    {area:'横浜市港北区', price:5640, diff:+3.1},
+    {area:'鎌倉市', price:5120, diff:+2.4},
+    {area:'藤沢市', price:4380, diff:+1.9},
+    {area:'相模原市南区', price:3260, diff:-0.6},
+    {area:'横須賀市', price:2410, diff:-1.2},
+  ],
+  townArticles: [
+    {date:'2026-09-30', area:'川崎市中原区', title:'タワーと商店街が同居する街、武蔵小杉の暮らしやすさ', e:'🏙'},
+    {date:'2026-09-15', area:'藤沢市', title:'通勤も海も諦めない。辻堂で見つけた週末の過ごし方', e:'🌊'},
+    {date:'2026-08-28', area:'横浜市青葉区', title:'緑と坂のある住宅街、たまプラーザの子育て事情', e:'🌳'},
+    {date:'2026-08-10', area:'小田原市', title:'新幹線で都心へ。小田原という選択肢', e:'🏯'},
+  ],
+};
+
+/* ============================================================
+   ④ 物件種別・条件・コンテンツ（デモ）
+============================================================ */
+const TYPES = [
+  {id:'new-mansion',  name:'新築マンション', e:'🏙', cnt:1340},
+  {id:'used-mansion', name:'中古マンション', e:'🏢', cnt:18420},
+  {id:'new-house',    name:'新築一戸建て',   e:'🏠', cnt:9870},
+  {id:'used-house',   name:'中古一戸建て',   e:'🏡', cnt:12960},
+  {id:'land',         name:'土地',           e:'🌳', cnt:7610},
+];
+const GNAV = [
+  {purpose:'マンションを買う', links:[{n:'新築',t:'new-mansion'},{n:'中古',t:'used-mansion'}]},
+  {purpose:'一戸建てを買う',   links:[{n:'新築',t:'new-house'},{n:'中古',t:'used-house'}]},
+  {purpose:'家を建てる',       links:[{n:'土地',t:'land'}]},
+  {purpose:'売る',             links:[{n:'売却査定',href:'sell.html'}], cls:'sell'},
+  {purpose:'住まいの相談',     links:[{n:'無料相談',href:'#'}]},
+  {purpose:'お金',             links:[{n:'住宅ローン',href:'#'}]},
+];
+const COND = {
+  price:   ['〜1,000万円','1,000万円台','2,000万円台','3,000万円台','4,000万円台','5,000万円台','6,000〜7,999万円','8,000万円以上'],
+  madori:  ['1K/1DK/1LDK','2K/2DK/2LDK','3K/3DK/3LDK','4K/4DK/4LDK','5K以上'],
+  walk:    ['1分以内','5分以内','7分以内','10分以内','15分以内','バス可'],
+  age:     ['新築','築5年以内','築10年以内','築20年以内','築30年以内'],
+  feature: ['南向き','角部屋','最上階','2階以上','タワーマンション','ペット可・相談','リフォーム・リノベ済み','オール電化','システムキッチン','食洗機','床暖房','ウォークインクローゼット','パントリー','宅配ボックス','ルーフバルコニー','庭付き','ウッドデッキ','駐車場あり','2世帯住宅','バリアフリー','角地','建築条件なし','フラット35適合','光回線対応'],
+};
+const FEATURES = [
+  {badge:'湘南特集', title:'海まで徒歩圏の住まい', desc:'藤沢・茅ヶ崎・鎌倉エリアの厳選物件', e:'🌊'},
+  {badge:'ファミリー', title:'子育てしやすい街の新築一戸建て', desc:'公園・学校が近い物件を集めました', e:'👨‍👩‍👧'},
+  {badge:'リノベ', title:'リノベーション済み中古マンション', desc:'新築より手頃に、新築同様の室内へ', e:'🛠'},
+  {badge:'通勤', title:'都心通勤30分以内の駅特集', desc:'東横線・田園都市線・湘南新宿ライン', e:'🚃'},
+];
+const LIFESTYLES = [
+  {name:'子育て世帯向け', e:'👶'},{name:'海の近く', e:'🌊'},{name:'都心通勤ラク', e:'🚃'},
+  {name:'平屋', e:'🛖'},{name:'リノベーション', e:'🛠'},{name:'二世帯住宅', e:'👪'},
+];
+const KODAWARI = [
+  {name:'駅徒歩10分以内', e:'🚶'},{name:'南向き', e:'☀️'},{name:'ペット可', e:'🐕'},
+  {name:'駐車場あり', e:'🚗'},{name:'3LDK以上', e:'🛏'},{name:'築10年以内', e:'✨'},
+];
+const PROPERTIES = [
+  {id:1, type:'used-mansion', price:4980, layout:'3LDK', size:'72.4㎡', addr:'川崎市中原区小杉町', access:'東急東横線「武蔵小杉」徒歩6分', year:'築12年', e:'🏢', isNew:true},
+  {id:2, type:'new-house',    price:5480, layout:'4LDK', size:'土地110㎡/建物98㎡', addr:'藤沢市辻堂元町', access:'JR東海道本線「辻堂」徒歩14分', year:'新築', e:'🏠', isNew:true},
+  {id:3, type:'used-house',   price:3680, layout:'4LDK', size:'土地132㎡/建物101㎡', addr:'横浜市青葉区美しが丘', access:'東急田園都市線「たまプラーザ」バス8分', year:'築18年', e:'🏡', isNew:false},
+  {id:4, type:'new-mansion',  price:7390, layout:'3LDK', size:'70.1㎡', addr:'横浜市西区みなとみらい', access:'みなとみらい線「みなとみらい」徒歩4分', year:'2027年竣工予定', e:'🏙', isNew:true},
+  {id:5, type:'land',         price:2850, layout:'',     size:'土地165㎡（49.9坪）', addr:'茅ヶ崎市東海岸北', access:'JR東海道本線「茅ヶ崎」徒歩16分', year:'建築条件なし', e:'🌳', isNew:false},
+  {id:6, type:'used-mansion', price:2380, layout:'2LDK', size:'61.8㎡', addr:'横須賀市本町', access:'京急本線「汐入」徒歩5分', year:'築25年・リノベ済', e:'🏢', isNew:false},
+  {id:7, type:'used-house',   price:4290, layout:'3LDK', size:'土地98㎡/建物92㎡', addr:'鎌倉市大船', access:'JR東海道本線「大船」徒歩11分', year:'築9年', e:'🏡', isNew:true},
+  {id:8, type:'new-house',    price:3990, layout:'4LDK', size:'土地120㎡/建物95㎡', addr:'海老名市中新田', access:'小田急小田原線「海老名」徒歩15分', year:'新築', e:'🏠', isNew:true},
+  {id:9, type:'land',         price:1980, layout:'',     size:'土地140㎡（42.3坪）', addr:'相模原市南区上鶴間', access:'小田急小田原線「相模大野」徒歩18分', year:'建築条件なし', e:'🌳', isNew:false},
+];
+const KNOWHOW = [
+  {e:'📘', n:'購入の基礎知識', d:'家を買う流れ・必要な準備をステップごとに解説'},
+  {e:'💴', n:'お金・ローン', d:'予算の決め方、住宅ローン、諸費用、税制'},
+  {e:'🔍', n:'物件選び・内見', d:'新築と中古の違い、内見で見るべきポイント'},
+  {e:'📰', n:'住まいのニュース', d:'市場動向や制度変更などの最新情報'},
+];
+const ARTICLES = [
+  {cat:'お金', title:'住宅ローンの借入額はいくらが目安？年収から考える無理のない返済', e:'💴'},
+  {cat:'お金', title:'物件価格以外にかかる諸費用の内訳と目安', e:'🧾'},
+  {cat:'買い方', title:'中古マンション購入の流れと内見で見るべきポイント', e:'🔍'},
+  {cat:'買い方', title:'新築一戸建てと中古一戸建て、どう選ぶ？', e:'🏡'},
+  {cat:'土地', title:'建築条件付き土地と条件なし土地の違い', e:'📐'},
+  {cat:'エリア', title:'神奈川で子育てしやすい街の選び方', e:'🗾'},
+];
+const NEWS = [
+  {d:'2026-10-08', t:'神奈川版サイトを公開しました'},
+  {d:'2026-10-01', t:'システムメンテナンスのお知らせ'},
+];
+
+/* ============================================================
+   ⑤ 画像（未用意でもフォールバックで崩れない）
+============================================================ */
+const HERO_IMGS     = ['images/hero_1.png','images/hero_2.png','images/hero_3.png'];        // 1200×260
+const TYPE_IMGS     = ['images/type_1.png','images/type_2.png','images/type_3.png','images/type_4.png','images/type_5.png']; // 160×160（TYPESの並び順）
+const SLIDER_IMGS   = ['images/feature_1.png','images/feature_2.png','images/feature_3.png','images/feature_4.png'];          // 600×188
+const SCENE_IMGS    = ['images/life_1.png','images/life_2.png','images/life_3.png','images/life_4.png','images/life_5.png','images/life_6.png']; // 160×106
+const KODAWARI_IMGS = ['images/kodawari_1.png','images/kodawari_2.png','images/kodawari_3.png','images/kodawari_4.png','images/kodawari_5.png','images/kodawari_6.png']; // 160×106
+
+function attachImg(el, src, fit, hideSelectors){
+  if(!el || !src) return;
+  const img = document.createElement('img');
+  img.alt = '';
+  img.style.cssText = `position:absolute;inset:0;width:100%;height:100%;object-fit:${fit};object-position:center;display:block;`;
+  img.onload = () => {
+    if(fit === 'contain') el.style.background = '#fff';
+    (hideSelectors||[]).forEach(s => { const t = el.querySelector(s); if(t) t.style.display = 'none'; });
+    el.insertBefore(img, el.firstChild);
+  };
+  img.src = src;
+}
+
+/* ============================================================
+   STATE / UTIL
+============================================================ */
+let currentType = TYPES[1].id;   // 初期は中古マンション
+let findMode = 'area';
+let propFilter = 'all';
+let favs = [];
+let viewHistory = [];
+
+const fmt = n => n.toLocaleString('ja-JP');
+function yen(man){
+  if(man >= 10000){
+    const oku = Math.floor(man/10000), rest = man%10000;
+    return `${oku}億${rest ? fmt(rest)+'万' : ''}円`;
+  }
+  return `${fmt(man)}万円`;
+}
+function typeName(id){ return (TYPES.find(t=>t.id===id)||{}).name || ''; }
+function searchUrl(params){
+  const base = {pref:PREF.code, type:currentType};
+  const q = new URLSearchParams(Object.assign(base, params));
+  [...q.keys()].forEach(k => { if(q.get(k)==='') q.delete(k); });
+  return `search.html?${q.toString()}`;
+}
+function demoCount(key){
+  let h = 0; for(const c of key + currentType) h = (h*31 + c.charCodeAt(0)) % 99991;
+  return 20 + h % 900;
+}
+
+/* ============================================================
+   RENDER
+============================================================ */
+function applyNames(){
+  const region = REGIONS.find(r=>r.code===PREF.region);
+  document.title = `${PREF.fullName}の不動産購入・住宅情報｜${SITE.name}`;
+  
+  document.querySelectorAll('[data-site-name]').forEach(e => e.textContent = SITE.name);
+  document.querySelectorAll('[data-pref-name]').forEach(e => e.textContent = PREF.fullName);
+  document.querySelectorAll('[data-region-name]').forEach(e => e.textContent = region ? region.name : '');
+  document.getElementById('topbar-text').textContent = `${PREF.fullName}の${SITE.tagline}｜マンション・一戸建て・土地`;
+  document.getElementById('to-national').href = '../index.html';
+  document.getElementById('breadcrumb').innerHTML =
+    `<a href="../index.html">${SITE.name}</a><span>›</span><a href="../${PREF.region}/index.html">${region?region.name:''}</a><span>›</span>${PREF.fullName}`;
+  document.getElementById('page-h1').textContent = `${PREF.fullName}の不動産・住宅購入情報`;
+  document.getElementById('page-intro').textContent = PREF.intro;
+  document.getElementById('copy-year').textContent = new Date().getFullYear();
+  document.getElementById('q-type').innerHTML = TYPES.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  document.getElementById('q-type').value = currentType;
+}
+
+function renderGnav(){
+  document.getElementById('gnav').innerHTML = GNAV.map(g=>`
+    <li class="gnav-item ${g.cls||''}">
+      <div class="gnav-purpose">${g.purpose}</div>
+      <div class="gnav-links">${g.links.map(l=>
+        l.t ? `<a href="#" onclick="setType('${l.t}');document.getElementById('find-anchor').scrollIntoView({behavior:'smooth'});return false;" title="${typeName(l.t)}">${l.n}</a>`
+            : `<a href="${l.href}">${l.n}</a>`).join('')}</div>
+    </li>`).join('');
+}
+
+/* ============================================================
+   エリアマップ
+============================================================ */
+let selectedArea = PREF.areas[0].key;
+function areaTotal(a){
+  return a.cities.reduce((s,c)=> s + demoCount((a.prefix||'') + c), 0);
+}
+function renderMapChips(){
+  document.getElementById('map-type-chips').innerHTML = TYPES.map(t=>
+    `<button class="map-type-chip${t.id===currentType?' on':''}" onclick="setType('${t.id}')">${t.name}</button>`).join('');
+}
+function renderAreaMap(){
+  const svg = document.getElementById('kmap');
+  const areas = PREF.areas.map(a=>`
+    <polygon class="map-area${a.key===selectedArea?' on':''}" data-key="${a.key}" points="${a.shape}" fill="${a.color}"
+      onclick="selectArea('${a.key}')" ondblclick="NAV.href=searchUrl({area:'${a.name}'})">
+      <title>${a.name}</title>
+    </polygon>`).join('');
+  const labels = PREF.areas.map(a=>`
+    <text class="map-label" x="${a.lx}" y="${a.ly}">${a.name}</text>
+    <text class="map-cnt" x="${a.lx}" y="${a.ly+16}">${fmt(areaTotal(a))}件</text>`).join('');
+  // 選択中エリアを最前面に（太枠が隠れないように）
+  svg.innerHTML = `
+    <text class="map-out" x="440" y="36">東京都</text>
+    <text class="map-out" x="40" y="30">山梨県</text>
+    <text class="map-out" x="30" y="430">静岡県</text>
+    <text class="map-sea" x="240" y="392">相 模 湾</text>
+    <text class="map-sea" x="548" y="300">東京湾</text>
+    ${areas}${labels}`;
+  const on = svg.querySelector('.map-area.on');
+  if(on) svg.insertBefore(on, svg.querySelector('.map-label'));
+}
+function selectArea(key){
+  selectedArea = key;
+  renderAreaMap();
+  renderAreaDetail();
+}
+function renderAreaDetail(){
+  const a = PREF.areas.find(x=>x.key===selectedArea);
+  if(!a) return;
+  document.getElementById('area-detail').innerHTML = `
+    <div class="area-detail-name"><span class="dot" style="background:${a.color}"></span>${a.name}</div>
+    <div class="area-detail-cnt">${typeName(currentType)}　<strong>${fmt(areaTotal(a))}</strong> 件</div>
+    <div class="region-links">${a.cities.map(c=>{
+      const full = (a.prefix||'') + c;
+      return `<a href="${searchUrl({area:full})}">${c}<span class="c">(${demoCount(full)})</span></a>`;
+    }).join('')}</div>
+    <a class="btn" href="${searchUrl({area:a.name})}">${a.name}の${typeName(currentType)}をすべて見る</a>
+    <div class="area-detail-hint" style="margin-top:12px;">※地図は模式図です／件数はデモ表示</div>`;
+}
+
+function renderHero(){
+  const hero = document.getElementById('hero');
+  hero.innerHTML = PREF.heroCopy.map((h,i)=>`
+    <div class="hero-slide${i===0?' on':''}" onclick="doSearch()" style="cursor:pointer;">
+      <div class="hero-fallback">
+        <div><span class="badge">${h.badge}</span><h2>${h.title}</h2><p>${h.desc}</p></div>
+        <div class="hero-emoji">${h.e}</div>
+      </div>
+    </div>`).join('')
+    + `<div class="hero-dots">${PREF.heroCopy.map((_,i)=>`<button class="hero-dot${i===0?' on':''}" onclick="showHero(${i})"></button>`).join('')}</div>`;
+  hero.querySelectorAll('.hero-slide').forEach((el,i)=> attachImg(el, HERO_IMGS[i], 'cover', ['.hero-fallback']));
+}
+let heroIdx = 0;
+function showHero(i){
+  const slides = document.querySelectorAll('.hero-slide'), dots = document.querySelectorAll('.hero-dot');
+  heroIdx = (i + slides.length) % slides.length;
+  slides.forEach((s,k)=> s.classList.toggle('on', k===heroIdx));
+  dots.forEach((d,k)=> d.classList.toggle('on', k===heroIdx));
+}
+// ヒーローは現在未使用（エリアマップに置き換え）。戻す場合は #hero を置いて renderHero() と下の行を有効化
+// setInterval(()=> showHero(heroIdx+1), 6000);
+
+function renderTypes(){
+  const c = document.getElementById('type-cards');
+  c.innerHTML = TYPES.map(t=>`
+    <div class="type-card${t.id===currentType?' on':''}" data-id="${t.id}" onclick="setType('${t.id}')">
+      <div class="type-card-bg">${t.e}</div>
+      <div class="type-card-label">${t.name}<div class="type-card-cnt">${fmt(t.cnt)}件</div></div>
+    </div>`).join('');
+  c.querySelectorAll('.type-card').forEach((el,i)=> attachImg(el, TYPE_IMGS[i], 'contain', ['.type-card-bg','.type-card-label']));
+}
+function setType(id){
+  currentType = id;
+  document.querySelectorAll('.type-card').forEach(el=> el.classList.toggle('on', el.dataset.id===id));
+  document.getElementById('q-type').value = id;
+  renderFind();
+  renderMapChips();
+  renderAreaMap();
+  renderAreaDetail();
+}
+
+function setFindMode(mode){
+  findMode = mode;
+  document.querySelectorAll('.find-tab').forEach(t=> t.classList.toggle('on', t.dataset.mode===mode));
+  renderFind();
+}
+function renderFind(){
+  document.getElementById('find-type-name').textContent = typeName(currentType);
+  const c = document.getElementById('find-content');
+  if(findMode === 'area'){
+    c.innerHTML = PREF.areas.map(r=>`
+      <div class="region-row">
+        <div class="region-name">${r.name}</div>
+        <div class="region-links">${r.cities.map(ct=>{
+          const full = (r.prefix||'') + ct;
+          return `<a href="${searchUrl({area:full})}">${ct}<span class="c">(${demoCount(full)})</span></a>`;
+        }).join('')}</div>
+      </div>`).join('');
+  } else if(findMode === 'line'){
+    c.innerHTML = PREF.lines.map(g=>`
+      <div class="line-group-title">${g.group}</div>
+      <div class="line-links">${g.items.map(l=>`<a href="${searchUrl({line:l})}">${l}</a>`).join('')}</div>`).join('');
+  } else {
+    c.innerHTML = `
+      <div class="map-box">
+        <div class="map-visual">🗺</div>
+        <div class="map-text">
+          <p>地図上で範囲を指定して${typeName(currentType)}を探せます。通勤先や実家からの距離で絞り込みたい方におすすめです。</p>
+          <a class="btn" href="${searchUrl({view:'map'})}">地図で探す</a>
+          <a class="btn ghost" href="#" onclick="locateMe();return false;" style="margin-left:6px;">現在地周辺を探す</a>
+        </div>
+      </div>`;
+  }
+}
+function locateMe(){
+  if(!navigator.geolocation){ toast('お使いのブラウザは位置情報に対応していません'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p => NAV.href = searchUrl({view:'map', lat:p.coords.latitude.toFixed(4), lng:p.coords.longitude.toFixed(4)}),
+    () => toast('位置情報を取得できませんでした')
+  );
+}
+
+function renderPickup(){
+  document.getElementById('pickup').innerHTML = PREF.pickupStations.map(s=>
+    `<a href="${searchUrl({station:s})}">${s}駅</a>`).join('');
+}
+
+function renderCond(){
+  Object.keys(COND).forEach(k=>{
+    document.getElementById('cond-'+k).innerHTML = COND[k].map(v=>
+      `<span class="kodawari-tag" data-key="${k}" onclick="toggleCond(this)">${v}</span>`).join('');
+  });
+}
+function toggleCond(el){
+  // 価格・駅徒歩・築年数は単一選択、間取り・特徴は複数選択
+  const single = ['price','walk','age'].includes(el.dataset.key);
+  if(single && !el.classList.contains('on')){
+    document.querySelectorAll(`.kodawari-tag[data-key="${el.dataset.key}"]`).forEach(t=>t.classList.remove('on'));
+  }
+  el.classList.toggle('on');
+}
+function clearCond(){ document.querySelectorAll('.cond-box .kodawari-tag.on').forEach(t=>t.classList.remove('on')); }
+function condParams(){
+  const p = {};
+  Object.keys(COND).forEach(k=>{
+    p[k] = [...document.querySelectorAll(`.kodawari-tag.on[data-key="${k}"]`)].map(t=>t.textContent).join(',');
+  });
+  return p;
+}
+
+let featureIdx = 0;
+function renderFeatures(){
+  const t = document.getElementById('feature-track');
+  t.innerHTML = FEATURES.map(f=>`
+    <div class="feature-item" onclick="doSearch()">
+      <div class="feature-item-bg">${f.e}</div>
+      <div class="feature-item-content">
+        <div class="feature-item-badge">${f.badge}</div>
+        <div class="feature-item-title">${f.title}</div>
+        <div class="feature-item-desc">${f.desc}</div>
+      </div>
+    </div>`).join('');
+  t.querySelectorAll('.feature-item').forEach((el,i)=> attachImg(el, SLIDER_IMGS[i], 'cover', ['.feature-item-bg','.feature-item-content']));
+}
+function slideFeature(dir){
+  const items = document.querySelectorAll('.feature-item');
+  const perView = window.innerWidth <= 640 ? 1 : 2;
+  const max = Math.max(0, items.length - perView);
+  featureIdx = Math.max(0, Math.min(featureIdx + dir, max));
+  const step = perView === 1 ? '(100% + 10px)' : '(50% + 5px)';
+  document.getElementById('feature-track').style.transform = `translateX(calc(-${featureIdx} * ${step}))`;
+}
+
+function renderSceneCards(id, data, imgs, key){
+  const c = document.getElementById(id);
+  c.innerHTML = data.map(d=>`
+    <div class="scene-card" onclick="NAV.href=searchUrl({${key}:'${d.name}'})">
+      <div class="scene-card-bg">${d.e}</div>
+      <div class="scene-card-label">${d.name}</div>
+    </div>`).join('');
+  c.querySelectorAll('.scene-card').forEach((el,i)=> attachImg(el, imgs[i], 'contain', ['.scene-card-bg','.scene-card-label']));
+}
+
+function renderPropTabs(){
+  const tabs = [{id:'all', name:'すべて'}].concat(TYPES);
+  document.getElementById('prop-tabs').innerHTML = tabs.map(t=>
+    `<button class="prop-tab${t.id===propFilter?' on':''}" onclick="setPropFilter('${t.id}')">${t.name}</button>`).join('');
+}
+function setPropFilter(id){ propFilter = id; renderPropTabs(); renderProps(); }
+function renderProps(){
+  const list = PROPERTIES.filter(p => propFilter==='all' || p.type===propFilter);
+  document.getElementById('prop-grid').innerHTML = list.length ? list.map(p=>`
+    <div class="prop-card" onclick="openProp(${p.id})">
+      <div class="prop-img">${p.e}
+        ${p.isNew?'<span class="prop-badge">NEW</span>':''}
+        <button class="prop-fav${favs.includes(p.id)?' on':''}" onclick="event.stopPropagation();toggleFav(${p.id})" title="お気に入り">♥</button>
+      </div>
+      <div class="prop-info">
+        <div class="prop-type">${typeName(p.type)}</div>
+        <div class="prop-price">${yen(p.price)}</div>
+        <div class="prop-spec">${p.layout ? p.layout + '／' : ''}${p.size}</div>
+        <div class="prop-addr">${p.addr}</div>
+        <div class="prop-access">${p.access}・${p.year}</div>
+      </div>
+    </div>`).join('') : '<div class="sb-empty">該当する物件がありません</div>';
+}
+function openProp(id){
+  viewHistory = [id].concat(viewHistory.filter(x=>x!==id)).slice(0,5);
+  renderSide();
+  NAV.href = `property.html?id=${id}`;
+}
+function toggleFav(id){
+  favs = favs.includes(id) ? favs.filter(x=>x!==id) : [id].concat(favs);
+  renderProps(); renderSide();
+}
+
+function findBy(kind){
+  const v = document.getElementById(kind==='bldg' ? 'q-bldg' : 'q-company').value.trim();
+  NAV.href = kind==='bldg'
+    ? `library.html?pref=${PREF.code}&q=${encodeURIComponent(v)}`
+    : `company.html?pref=${PREF.code}&q=${encodeURIComponent(v)}`;
+}
+
+function renderSouba(){
+  document.getElementById('souba-links').innerHTML = TYPES.map(t=>
+    `<a href="souba.html?pref=${PREF.code}&type=${t.id}">${t.name}の相場</a>`).join('');
+  document.getElementById('souba-body').innerHTML = PREF.souba.map(s=>`
+    <tr>
+      <td><a href="${searchUrl({area:s.area, type:'used-mansion'})}">${s.area}</a></td>
+      <td class="num">${yen(s.price)}</td>
+      <td class="num"><span class="${s.diff>=0?'up':'down'}">${s.diff>=0?'▲':'▼'} ${Math.abs(s.diff).toFixed(1)}%</span></td>
+    </tr>`).join('');
+}
+
+function renderKnowhow(){
+  document.getElementById('knowhow').innerHTML = KNOWHOW.map(k=>`
+    <div class="box knowhow-item">
+      <div class="knowhow-ico">${k.e}</div>
+      <div class="knowhow-name">${k.n}</div>
+      <div class="knowhow-desc">${k.d}</div>
+    </div>`).join('');
+  document.getElementById('articles').innerHTML = ARTICLES.map(a=>`
+    <div class="article-card">
+      <div class="article-card-img">${a.e}</div>
+      <div class="article-cat">${a.cat}</div>
+      <div class="article-card-title">${a.title}</div>
+    </div>`).join('');
+}
+function renderTown(){
+  document.getElementById('town-list').innerHTML = PREF.townArticles.map(a=>`
+    <div class="town-item">
+      <div class="town-thumb">${a.e}</div>
+      <div>
+        <div class="town-date">${a.date}</div>
+        <div class="town-title">${a.title}</div>
+        <div class="town-area">📍 ${a.area}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderOtherAreas(){
+  document.getElementById('neighbor-links').innerHTML = PREF.neighbors.map(n=>`<a href="../${n.code}/index.html">${n.name}</a>`).join('');
+  const regionHtml = REGIONS.map(r=>`<a href="../${r.code}/index.html">${r.name}</a>`).join('');
+  document.getElementById('region-links').innerHTML = regionHtml;
+  document.getElementById('footer-regions').innerHTML = regionHtml;
+  document.getElementById('footer-types').innerHTML = TYPES.map(t=>`<a href="${searchUrl({type:t.id})}">${PREF.fullName}の${t.name}</a>`).join('')
+    + `<a href="sell.html">不動産売却・査定</a>`;
+  const cities = PREF.areas.flatMap(r => r.prefix ? r.cities.map(c=>r.prefix+c) : r.cities);
+  document.getElementById('footer-cities').innerHTML = cities.map(c=>`<a href="${searchUrl({area:c})}">${c}</a>`).join('');
+}
+
+function sbList(ids, emptyText){
+  const items = ids.map(id => PROPERTIES.find(p=>p.id===id)).filter(Boolean);
+  if(!items.length) return `<div class="sb-empty">${emptyText}</div>`;
+  return items.map(p=>`
+    <div class="sb-item" onclick="openProp(${p.id})">
+      <div class="sb-thumb">${p.e}</div>
+      <div><div class="sb-name">${yen(p.price)}</div><div class="sb-sub">${typeName(p.type)}／${p.addr}</div></div>
+    </div>`).join('');
+}
+function renderSide(){
+  document.getElementById('sb-fav').innerHTML = sbList(favs, '物件の♥を押すとここに表示されます');
+  document.getElementById('sb-history').innerHTML = sbList(viewHistory, 'まだ閲覧した物件はありません');
+  document.getElementById('fav-count').textContent = favs.length;
+}
+function renderNews(){
+  document.getElementById('sb-news').innerHTML = NEWS.map(n=>`
+    <div class="sb-news-item"><div class="sb-news-date">${n.d}</div><a href="#" class="sb-news-link">${n.t}</a></div>`).join('');
+}
+
+/* ============================================================
+   住宅ローン（元利均等）
+============================================================ */
+function calcLoan(){
+  const P = (parseFloat(document.getElementById('sim-amount').value)||0) * 10000;
+  const r = (parseFloat(document.getElementById('sim-rate').value)||0) / 100 / 12;
+  const n = (parseInt(document.getElementById('sim-years').value)||0) * 12;
+  const out = document.getElementById('sim-result');
+  if(P<=0 || n<=0){ out.textContent = '-'; return; }
+  const m = r===0 ? P/n : P*r/(1-Math.pow(1+r,-n));
+  out.textContent = `約${fmt(Math.round(m))}円`;
+}
+
+/* ============================================================
+   SEARCH / SUGGEST
+============================================================ */
+function suggestSource(){
+  const cities = PREF.areas.flatMap(r => r.cities.map(c => ({label:(r.prefix||'')+c, kind:'市区町村'})));
+  const stations = PREF.stations.map(s => ({label:s+'駅', kind:'駅'}));
+  const lines = PREF.lines.flatMap(g => g.items.map(l => ({label:l, kind:'沿線'})));
+  return cities.concat(stations, lines);
+}
+function showSuggest(inp){
+  const box = document.getElementById('suggest-box');
+  const val = inp.value.trim();
+  if(!val){ box.style.display='none'; return; }
+  const matched = suggestSource().filter(s => s.label.includes(val)).slice(0,12);
+  document.getElementById('suggest-content').innerHTML = matched.length
+    ? matched.map(s=>`<div class="sg-item" onclick="pickSuggest('${s.label}')">📍 ${s.label}<small>${s.kind}</small></div>`).join('')
+    : `<div style="color:var(--text2);">該当する市区町村・駅・沿線がありません。</div>`;
+  box.style.display = 'block';
+}
+function pickSuggest(v){
+  document.getElementById('area-inp').value = v;
+  document.getElementById('suggest-box').style.display = 'none';
+}
+document.addEventListener('click', e=>{
+  if(!e.target.closest('.hdr-inner')) document.getElementById('suggest-box').style.display = 'none';
+});
+function doSearch(){
+  NAV.href = searchUrl(Object.assign({
+    type: document.getElementById('q-type').value || currentType,
+    q: document.getElementById('area-inp').value.trim(),
+    pmax: document.getElementById('q-price').value,
+  }, condParams()));
+}
+window.addEventListener('scroll', ()=>{
+  document.getElementById('pagetop').style.display = window.scrollY > 600 ? 'block' : 'none';
+});
+
+/* ============================================================
+   INIT
+============================================================ */
+// 「エリア・沿線・地図」セクションへのスクロール用アンカー
+document.querySelector('.find-panel').id = 'find-anchor';
+
+applyNames();
+renderGnav();
+renderMapChips();
+renderAreaMap();
+renderAreaDetail();
+renderTypes();
+renderFind();
+renderPickup();
+renderCond();
+renderFeatures();
+renderSceneCards('scene-cards', LIFESTYLES, SCENE_IMGS, 'life');
+renderSceneCards('kodawari-cards', KODAWARI, KODAWARI_IMGS, 'kodawari');
+renderPropTabs();
+renderProps();
+renderSouba();
+renderKnowhow();
+renderTown();
+renderOtherAreas();
+renderSide();
+renderNews();
+calcLoan();
+</script>
+
+
+</body>
+</html>
